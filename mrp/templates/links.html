@@ -1,0 +1,106 @@
+{% block content %}
+<style>
+    form {
+    display: block;
+    margin-top: 0em;
+    margin-block-end: 0em;
+}
+
+    /* Добавьте следующий стиль для выравнивания кнопки по центру */
+    p {
+        list-style: none;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-top: 20px; /* Добавленный отступ сверху для выравнивания */
+    }
+
+a {
+    text-decoration: none;
+    width: 100px;
+    color: brown;
+    margin: 10px;
+    padding: 7px;
+    border: 2px solid brown;
+    border-radius: 8px;
+    display: block;
+    font-weight: bold;
+}
+ input[type="submit"]:hover {
+        background-color: darkbrown; /* Цвет при наведении */
+    }
+    input[type="text"] {
+        padding: 10px;
+        margin-bottom: 10px;
+        border: 2px solid brown;
+        border-radius: 5px;
+        width: 200px; /* Задайте ширину, если нужно */
+    }
+       input[type="submit"] {
+        background-color: brown;
+        color: white;
+        border: none;
+        padding: 12px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        margin-bottom: 10px;
+        font-weight: bold;
+    }
+</style>
+    <h1 align="center" style="color:brown;">Таблица связей</h1>
+
+    <!-- Your Links CRUD HTML content here -->
+    <table>
+        <thead style="display:block">
+            <tr>
+                <th>ID</th>
+                <th width="200px">Upper Node Name</th>
+                <th width="200px">Lower Node Name</th>
+                <th width="200px">Weight</th>
+                <th width="200px">Unit of Measurement</th>
+
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in data %}
+                <tr>
+                    <td>
+                        <form action="{{ url_for('links_update') }}" method="post">
+                            <label>{{ row[0] }}</label>
+                            <input type="hidden" name="id" value="{{ row[0] }}">
+                            <input type="text" name="upper_node_name" size="10" value="{{ row[1] }}">
+                            <input type="text" name="lower_node_name" size="10" value="{{ row[2] }}">
+                            <input type="text" name="weight" size="5" value="{{ row[3] }}">
+                            <input type="text" name="unit_of_measurement" size="15" value="{{ row[4] }}">
+                            <input type="submit" value="Изменить">
+                        </form>
+                    </td>
+                    <td>
+                        <form action="{{ url_for('links_delete') }}" method="post">
+                            <input type="hidden" name="id" value="{{ row[0] }}">
+                            <input type="submit" value="Удалить">
+                        </form>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <h2>Создать новую связь</h2>
+    <form action="{{ url_for('links_create') }}" method="post">
+        <input type="text" name="upper_node_name" placeholder="Номер верхнего узла">
+        <input type="text" name="lower_node_name" placeholder="Номер нижнего узла">
+        <input type="text" name="weight" placeholder="Вес">
+        <input type="text" name="unit_of_measurement" placeholder="Единицы измерения">
+        <input type="submit" value="Создать">
+    </form>
+    <!-- Содержание links.html -->
+    <h2>Поиск связи по ID</h2>
+    <form action="{{ url_for('links_get') }}" method="get">
+        <input type="text" name="id" placeholder="ID связи">
+        <input type="submit" value="Искать">
+    </form>
+    <p><a href="{{ url_for('home') }}" style="text-align: center">На главную</a></p>
+
+{% endblock %}

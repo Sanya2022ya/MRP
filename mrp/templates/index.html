@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>MRP app</title>
+</head>
+<body>
+<h1 style="color:brown;text-align: center">Таблица узлов</h1>
+    <table>
+    <thead style="display:block">
+        <tr>
+            <th>ID</th>
+            <th width="34%">Имя узла </th>
+            <th width="33%">Описание узла </th>
+            <th width="33%">Действие </th>
+        </tr>
+    </thead>
+   <tbody>
+    {% for row in data %}
+        <tr>
+            <td>
+                <form action="/update" method="post">
+                    <label>{{ row[0] }}</label>
+                    <input type="hidden" name="id" value="{{ row[0] }}">
+                    <input type="text" name="nodename" size="20" value="{{ row[1] }}">
+                    <input type="text" name="nodedescription" size="30" value="{{ row[2] }}">
+                    <input type="submit" value="Изменить">
+                </form>
+            </td>
+            <td>
+                <form id="deleteForm{{ row[0] }}" action="/delete" method="post">
+                    <input type="hidden" name="id" value="{{ row[0] }}">
+                    <!-- Добавлен JavaScript для вызова confirm() перед отправкой формы -->
+                    <input type="button" value="Удалить" onclick="confirmDelete({{ row[0] }})">
+                </form>
+            </td>
+        </tr>
+    {% endfor %}
+</tbody>
+
+<script>
+    // JavaScript функция для подтверждения удаления
+    function confirmDelete(id) {
+        var result = confirm("Вы уверены, что хотите удалить этот узел?");
+        if (result) {
+            // Если пользователь согласен, отправляем форму для удаления
+            document.getElementById("deleteForm" + id).submit();
+        }
+    }
+</script>
+</table>
+<h2>Найти узел по имени</h2>
+<form action="/get" method="get">
+    <input type="text" name="search" placeholder="Поиск по имени узла">
+    <input type="submit" value="Искать">
+</form>
+<h2>Добавить новый узел</h2>
+    <form action="/create" method="post">
+    <input type="text" name="nodename" placeholder="Имя узла">
+    <input type="text" name="nodedescription" placeholder="Описание узла">
+    <input type="submit" value="Добавить">
+    </form>
+
+</body>
+</html>

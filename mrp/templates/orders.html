@@ -1,0 +1,109 @@
+<style>
+        p {
+        list-style: none;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-top: 20px; /* Добавленный отступ сверху для выравнивания */
+    }
+
+a {
+    text-decoration: none;
+    width: 100px;
+    color: brown;
+    margin: 10px;
+    padding: 7px;
+    border: 2px solid brown;
+    border-radius: 8px;
+    display: block;
+    font-weight: bold;
+}
+     form {
+    display: block;
+    margin-top: 0em;
+    margin-block-end: 0em;
+}
+    input[type="submit"] {
+        background-color: brown;
+        color: white;
+        border: none;
+        padding: 12px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        margin-bottom: 10px;
+        font-weight: bold;
+    }
+
+    input[type="submit"]:hover {
+        background-color: darkbrown; /* Цвет при наведении */
+    }
+    input[type="text"] {
+        padding: 10px;
+        margin-bottom: 10px;
+        border: 2px solid brown;
+        border-radius: 5px;
+        width: 200px; /* Задайте ширину, если нужно */
+    }
+</style>
+{% block content %}
+    <h1 align="center" style="color:brown;">Таблица заказов</h1>
+    
+    <!-- Your Orders CRUD HTML content here -->
+    <table>
+        <thead style="display:block">
+            <tr>
+                <th>ID</th>
+                <th width="200px">Node ID</th>
+                <th width="200px">Order Date</th>
+                <th width="200px">Quantity Ordered</th>
+                <th width="200px">Description</th>
+                <th width="200px">Supplier</th>
+                <th width="200px">Price</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in data %}
+                <tr>
+                    <td>
+                        <form action="{{ url_for('orders_update') }}" method="post">
+                            <label>{{ row[0] }}</label>
+                            <input type="hidden" name="id" value="{{ row[0] }}">
+                            <input type="text" name="node_id" size="5" value="{{ row[1] }}">
+                            <input type="text" name="order_date" size="10" value="{{ row[2] }}">
+                            <input type="text" name="quantity_ordered" size="10" value="{{ row[3] }}">
+                            <input type="text" name="description" size="35" value="{{ row[4] }}">
+                            <input type="text" name="supplier" size="20" value="{{ row[5] }}">
+                            <input type="text" name="price" size="10" value="{{ row[6] }}">
+                            <input type="submit" value="Изменить">
+                        </form>
+                    </td>
+                    <td>
+                        <form action="{{ url_for('orders_delete') }}" method="post">
+                            <input type="hidden" name="id" value="{{ row[0] }}">
+                            <input type="submit" value="Удалить">
+                        </form>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <h2>Создать новый заказ</h2>
+    <form action="{{ url_for('orders_create') }}" method="post">
+        <input type="text" name="node_id" placeholder="ID узла">
+        <input type="text" name="order_date" placeholder="Дата заказа">
+        <input type="text" name="quantity_ordered" placeholder="Объем заказа">
+        <input type="text" name="description" placeholder="Описание">
+        <input type="text" name="supplier" placeholder="Поставщик">
+        <input type="text" name="price" placeholder="Цена">
+        <input type="submit" value="Создать">
+    </form>
+    <h2>Поиск заказа по ID</h2>
+    <form action="{{ url_for('orders_get') }}" method="get">
+        <input type="text" name="id" placeholder="ID заказа">
+        <input type="submit" value="Найти">
+    </form>
+<p><a href="{{ url_for('home') }}" style="text-align: center">На главную</a></p>
+
+{% endblock %}

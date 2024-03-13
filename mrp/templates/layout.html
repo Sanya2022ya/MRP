@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>MRP app</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+
+            justify-content: top;
+            height: 100vh; /* Заполняет всю высоту видимой области */
+            margin: 0;
+            padding: 0;
+            text-align: center;
+        }
+
+        h1 {
+            color: brown;
+        }
+
+        nav {
+            margin-top: 20px;
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        ul a {
+            text-decoration: none;
+            width: 100px;
+            color: brown; /* измените цвет текста */
+            margin: 10px; /* увеличьте отступы */
+            padding: 15px; /* увеличьте размеры */
+            border: 2px solid brown; /* добавьте границу */
+            border-radius: 8px; /* добавьте скругленные углы */
+            display: block;
+            font-weight: bold; /* сделайте текст жирным */
+        }
+    </style>
+</head>
+<body>
+    <h1>Главная</h1>
+    <nav>
+        <ul>
+            <a href="{{ url_for('nodes_index') }}">Узлы</a>
+            <a href="{{ url_for('links_index') }}">Связи</a>
+            <a href="{{ url_for('orders_index') }}">Заказы</a>
+        </ul>
+    </nav>
+    {% block content %}{% endblock %}
+</body>
+</html>

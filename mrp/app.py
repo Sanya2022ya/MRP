@@ -85,7 +85,17 @@ def nodes_get():
 def links_index():
     conn = db_conn()
     cur = conn.cursor()
-    cur.execute('''SELECT * FROM links ORDER by id''')
+    cur.execute('''SELECT l.id, 
+                          l.upperNodeName, 
+                          n1.nodeName AS upperNodeFullName, 
+                          l.lowerNodeName, 
+                          n2.nodeName AS lowerNodeFullName, 
+                          l.weight, 
+                          l.unitOfMeasurement 
+                   FROM links l
+                   INNER JOIN nodes n1 ON l.upperNodeName = n1.id
+                   INNER JOIN nodes n2 ON l.lowerNodeName = n2.id
+                   ORDER by l.id''')
     data = cur.fetchall()
     cur.close()
     conn.close()
@@ -96,14 +106,14 @@ def links_index():
 def links_create():
     conn = db_conn()
     cur = conn.cursor()
-    upper_node_name = request.form['upper_node_name']
-    lower_node_name = request.form['lower_node_name']
+    upper_node_id = request.form['upper_node_id']
+    lower_node_id = request.form['lower_node_id']
     weight = request.form['weight']
     unit_of_measurement = request.form['unit_of_measurement']
     cur.execute(
-        '''INSERT INTO links (uppernodename, lowernodename, weight, unitofmeasurement) 
+        '''INSERT INTO links (upperNodeName, lowerNodeName, weight, unitOfMeasurement) 
            VALUES(%s, %s, %s, %s)''',
-        (upper_node_name, lower_node_name, weight, unit_of_measurement)
+        (upper_node_id, lower_node_id, weight, unit_of_measurement)
     )
     conn.commit()
     cur.close()
@@ -115,16 +125,46 @@ def links_create():
 def links_update():
     conn = db_conn()
     cur = conn.cursor()
-    upper_node_name = request.form['upper_node_name']
-    lower_node_name = request.form['lower_node_name']
+
+    # Получаем значения из формы
+    upper_node_full_name = request.form['upper_node_full_name']
+    lower_node_full_name = request.form['lower_node_full_name']
     weight = request.form['weight']
     unit_of_measurement = request.form['unit_of_measurement']
     link_id = request.form['id']
+
+    # Получаем идентификаторы узлов на основе их полных имен
+    cur.execute('''SELECT id FROM nodes WHERE nodeName = %s''', (upper_node_full_name,))
+    result = cur.fetchone()
+    if result:
+        upper_node_id = result[0]
+    else:
+        # Обработка случая, когда узел верхнего уровня не найден
+        # Можно вернуть сообщение об ошибке или выполнить другие действия по вашему усмотрению
+        # В данном случае я просто возвращаю пустой ответ
+        return "Ошибка: Узел верхнего уровня не найден"
+
+    cur.execute('''SELECT id FROM nodes WHERE nodeName = %s''', (lower_node_full_name,))
+    result = cur.fetchone()
+    if result:
+        lower_node_id = result[0]
+    else:
+        # Обработка случая, когда узел нижнего уровня не найден
+        # Можно вернуть сообщение об ошибке или выполнить другие действия по вашему усмотрению
+        # В данном случае я просто возвращаю пустой ответ
+        return "Ошибка: Узел нижнего уровня не найден"
+
+    # Обновляем запись в базе данных с использованием идентификаторов узлов
     cur.execute(
-        '''UPDATE links SET uppernodename=%s, lowernodename=%s, weight=%s, unitofmeasurement=%s WHERE id=%s''',
-        (upper_node_name, lower_node_name, weight, unit_of_measurement, link_id)
+        '''UPDATE links 
+           SET upperNodeName = %s, lowerNodeName = %s, weight = %s, unitOfMeasurement = %s 
+           WHERE id = %s''',
+        (upper_node_id, lower_node_id, weight, unit_of_measurement, link_id)
     )
     conn.commit()
+    cur.close()
+    conn.close()
+
     return redirect(url_for('links_index'))
 
 
@@ -149,9 +189,28 @@ def links_get():
     cur = conn.cursor()
 
     if id:
-        cur.execute('''SELECT * FROM links WHERE id = %s''', (id,))
+        cur.execute('''SELECT l.id, 
+                              l.upperNodeName, 
+                              n1.nodeName AS upperNodeFullName, 
+                              l.lowerNodeName, 
+                              n2.nodeName AS lowerNodeFullName, 
+                              l.weight, 
+                              l.unitOfMeasurement 
+                       FROM links l
+                       INNER JOIN nodes n1 ON l.upperNodeName = n1.id
+                       INNER JOIN nodes n2 ON l.lowerNodeName = n2.id
+                       WHERE l.id = %s''', (id,))
     else:
-        cur.execute('''SELECT * FROM links''')
+        cur.execute('''SELECT l.id, 
+                              l.upperNodeName, 
+                              n1.nodeName AS upperNodeFullName, 
+                              l.lowerNodeName, 
+                              n2.nodeName AS lowerNodeFullName, 
+                              l.weight, 
+                              l.unitOfMeasurement 
+                       FROM links l
+                       INNER JOIN nodes n1 ON l.upperNodeName = n1.id
+                       INNER JOIN nodes n2 ON l.lowerNodeName = n2.id''')
 
     data = cur.fetchall()
     cur.close()
@@ -249,6 +308,86 @@ def orders_get():
         return render_template('orders.html', error='No orders found')
 
     return render_template('orders.html', data=data)
+
+
+@app.route('/warehouse')
+def warehouse_index():
+    conn = db_conn()
+    cur = conn.cursor()
+    cur.execute('''SELECT * FROM warehouse ORDER BY id''')
+    data = cur.fetchall()
+    cur.close()
+    conn.close()
+    return render_template('warehouse.html', data=data)
+
+
+@app.route('/warehouse/create', methods=['POST'])
+def warehouse_create():
+    conn = db_conn()
+    cur = conn.cursor()
+    node_id = request.form['node_id']
+    received_quantity = request.form['received_quantity']
+    shipped_quantity = request.form['shipped_quantity']
+    date = request.form['date']
+    cur.execute('''INSERT INTO warehouse (nodeId, receivedQuantity, shippedQuantity, date) VALUES(%s, %s, %s, %s)''',
+                (node_id, received_quantity, shipped_quantity, date))
+    conn.commit()
+    cur.close()
+    conn.close()
+    return redirect(url_for('warehouse_index'))
+
+
+@app.route('/warehouse/update', methods=['POST'])
+def warehouse_update():
+    conn = db_conn()
+    cur = conn.cursor()
+    node_id = request.form['node_id']
+    received_quantity = request.form['received_quantity']
+    shipped_quantity = request.form['shipped_quantity']
+    date = request.form['date']
+    warehouse_id = request.form['id']
+    cur.execute('''UPDATE warehouse SET nodeId=%s, receivedQuantity=%s, shippedQuantity=%s, date=%s WHERE id=%s''',
+                (node_id, received_quantity, shipped_quantity, date, warehouse_id))
+    conn.commit()
+    cur.close()
+    conn.close()
+    return redirect(url_for('warehouse_index'))
+
+
+@app.route('/warehouse/delete', methods=['POST'])
+def warehouse_delete():
+    conn = db_conn()
+    cur = conn.cursor()
+    warehouse_id = request.form['id']
+    cur.execute('''DELETE FROM warehouse WHERE id=%s''', (warehouse_id,))
+    conn.commit()
+    cur.close()
+    conn.close()
+    return redirect(url_for('warehouse_index'))
+
+
+@app.route('/warehouse/get', methods=['GET'])
+def warehouse_get():
+    search = request.args.get('search', '')
+
+    conn = db_conn()
+    cur = conn.cursor()
+
+    if search:
+        cur.execute('''SELECT * FROM warehouse WHERE nodeId = %s''', (search,))
+    else:
+        cur.execute('''SELECT * FROM warehouse''')
+
+    data = cur.fetchall()
+    cur.close()
+    conn.close()
+
+    if not data:
+        return render_template('warehouse.html', error='No warehouse found')
+
+    return render_template('warehouse.html', data=data)
+
+
 
 if __name__ == '__main__':
     app.run(debug=True)

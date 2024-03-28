@@ -34,13 +34,13 @@
         ul a {
             text-decoration: none;
             width: 100px;
-            color: brown; /* измените цвет текста */
-            margin: 10px; /* увеличьте отступы */
-            padding: 15px; /* увеличьте размеры */
-            border: 2px solid brown; /* добавьте границу */
-            border-radius: 8px; /* добавьте скругленные углы */
+            color: brown;
+            margin: 10px;
+            padding: 15px;
+            border: 2px solid brown;
+            border-radius: 8px;
             display: block;
-            font-weight: bold; /* сделайте текст жирным */
+            font-weight: bold;
         }
     </style>
 </head>
@@ -51,6 +51,7 @@
             <a href="{{ url_for('nodes_index') }}">Узлы</a>
             <a href="{{ url_for('links_index') }}">Связи</a>
             <a href="{{ url_for('orders_index') }}">Заказы</a>
+            <a href="{{ url_for('warehouse_index') }}">Склад</a>
         </ul>
     </nav>
     {% block content %}{% endblock %}

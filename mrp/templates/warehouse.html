@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Warehouse</title>
+    <style>
+        p {
+            list-style: none;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 20px;
+        }
+
+        a {
+            text-decoration: none;
+            width: 100px;
+            color: brown;
+            margin: 10px;
+            padding: 7px;
+            border: 2px solid brown;
+            border-radius: 8px;
+            display: block;
+            font-weight: bold;
+        }
+
+        input[type="submit"] {
+            background-color: brown;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        input[type="submit"]:hover {
+            background-color: darkbrown;
+        }
+
+        input[type="text"] {
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 2px solid brown;
+            border-radius: 5px;
+            width: 200px;
+        }
+    </style>
+</head>
+<body>
+<h1 style="color: brown; text-align: center;">Таблица склада</h1>
+<table>
+    <thead style="display:block">
+    <tr>
+        <th>ID</th>
+        <th width="220px" style="text-align:center">Node ID</th>
+        <th width="230px" style="text-align:center">Received Quantity</th>
+        <th width="230px" style="text-align:center">Shipped Quantity</th>
+        <th width="230px" style="text-align:center">Date</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for row in data %}
+    <tr>
+        <td>
+            <form action="{{ url_for('warehouse_update') }}" method="post">
+                <label>{{ row[0] }}</label>
+                <input type="hidden" name="id" value="{{ row[0] }}">
+                <input type="text" name="node_id" size="20" value="{{ row[1] }}">
+                <input type="text" name="received_quantity" size="30" value="{{ row[2] }}">
+                <input type="text" name="shipped_quantity" size="30" value="{{ row[3] }}">
+                <input type="text" name="date" size="30" value="{{ row[4] }}">
+                <input type="submit" value="Изменить">
+            </form>
+        </td>
+        <td>
+            <form action="{{ url_for('warehouse_delete') }}" method="post">
+                <input type="hidden" name="id" value="{{ row[0] }}">
+                <input type="submit" value="Удалить">
+            </form>
+        </td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+<h2>Поиск склада по ID узла</h2>
+<form action="{{ url_for('warehouse_get') }}" method="get">
+    <input type="text" name="search" placeholder="ID узла">
+    <input type="submit" value="Найти">
+</form>
+<h2>Создать новый склад</h2>
+<form action="{{ url_for('warehouse_create') }}" method="post">
+    <input type="text" name="node_id" placeholder="ID узла">
+    <input type="text" name="received_quantity" placeholder="Количество полученного товара">
+    <input type="text" name="shipped_quantity" placeholder="Количество отгруженного товара">
+    <input type="date" name="date" placeholder="Дата">
+    <input type="submit" value="Создать">
+</form>
+<p><a href="{{ url_for('home') }}" style="text-align: center">На главную</a></p>
+</body>
+</html>

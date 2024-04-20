@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Node Details</title>
+    <style>
+        p {
+            list-style: none;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            margin-top: 20px;
+        }
+
+        a {
+            text-decoration: none;
+            width: 100px;
+            color: brown;
+            margin: 10px;
+            padding: 7px;
+            border: 2px solid brown;
+            border-radius: 8px;
+            display: block;
+            font-weight: bold;
+        }
+
+        input[type="submit"] {
+            background-color: brown;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        input[type="submit"]:hover {
+            background-color: darkbrown; /* Цвет при наведении */
+        }
+
+        input[type="text"] {
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 2px solid brown;
+            border-radius: 5px;
+            width: 200px; /* Задайте ширину, если нужно */
+        }
+    </style>
+</head>
+<body>
+    <h1 style="color: brown;">Детали узла</h1>
+    <h2 style="color: brown;">Выберите Узел</h2>
+    <form action="{{ url_for('nodes_details.nodes_details') }}" method="get">
+        <input type="text" name="node_id" placeholder="ID узла">
+        <input type="submit" value="Показать базовые узлы">
+    </form>
+
+    {% if upper_node %}
+        <h2 style="color: brown;">Верхний Узел</h2>
+        <p>ID: {{ upper_node[0] }}</p>
+        <p>Имя: {{ upper_node[1] }}</p>
+        <p>Описание: {{ upper_node[2] }}</p>
+{% if intermediate_nodes %}
+    <h2 style="color: brown;">Промежуточные Узлы</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Имя</th>
+                <th>Описание</th>
+                <th>Вес</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for node in intermediate_nodes %}
+            <tr>
+                <td>{{ node[0] }}</td>
+                <td>{{ node[1] }}</td>
+                <td>{{ node[2] }}</td>
+                <td>{{ node[3] }}</td> <!-- Выводим вес для промежуточных узлов -->
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endif %}
+
+
+
+        <h2 style="color: brown;">Базовые Узлы</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Имя</th>
+                    <th>Описание</th>
+                    <th>Вес</th> <!-- Добавлено новое поле -->
+                </tr>
+            </thead>
+            <tbody>
+                {% for node in lowest_nodes %}
+                <tr>
+                    <td>{{ node[0] }}</td>
+                    <td>{{ node[1] }}</td>
+                    <td>{{ node[2] }}</td>
+                    <td>{{ node[3] }}</td> <!-- Вывод поля weight -->
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+
+    <p><a href="{{ url_for('home') }}" style="text-align: center;">На главную</a></p>
+</body>
+</html>

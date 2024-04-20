@@ -68,7 +68,7 @@ a {
             {% for row in data %}
                 <tr>
                     <td>
-                       <form action="{{ url_for('links_update') }}" method="post">
+                       <form action="{{ url_for('links.links_update') }}" method="post">
                             <label>{{ row[0] }}</label>
                             <input type="hidden" name="id" value="{{ row[0] }}">
                             <input type="text" name="upper_node_name" size="10" value="{{ row[1] }}">
@@ -83,7 +83,7 @@ a {
                         </form>
                     </td>
                     <td>
-                        <form action="{{ url_for('links_delete') }}" method="post">
+                        <form action="{{ url_for('links.links_delete') }}" method="post">
                             <input type="hidden" name="id" value="{{ row[0] }}">
                             <input type="submit" value="Удалить">
                         </form>
@@ -94,7 +94,7 @@ a {
     </table>
 
    <h2>Создать новую связь</h2>
-<form action="{{ url_for('links_create') }}" method="post">
+<form action="{{ url_for('links.links_create') }}" method="post">
     <input type="text" name="upper_node_id" placeholder="Номер верхнего узла">
     <input type="text" name="lower_node_id" placeholder="Номер нижнего узла">
     <input type="text" name="weight" placeholder="Вес">
@@ -104,7 +104,7 @@ a {
 
 
     <h2>Поиск связи по ID</h2>
-    <form action="{{ url_for('links_get') }}" method="get">
+    <form action="{{ url_for('links.links_get') }}" method="get">
     <input type="text" name="id" placeholder="ID связи">
     <input type="submit" value="Искать">
 </form>

@@ -62,7 +62,7 @@ a {
      {% for row in data %}
         <tr>
         <td>
-            <form action="{{ url_for('nodes_update') }}" method="post">
+            <form action="{{ url_for('nodes.nodes_update') }}" method="post">
             <label>{{ row[0] }}</label>
             <input type="hidden" name="id" value="{{ row[0] }}">
             <input type="text" name="nodename" size="20" value="{{ row[1] }}">
@@ -71,7 +71,7 @@ a {
             </form>
         </td>
         <td>
-            <form action="{{ url_for('nodes_delete') }}" method="post">
+            <form action="{{ url_for('nodes.nodes_delete') }}" method="post">
             <input type="hidden" name="id" value="{{ row[0] }}">
             <input type="submit" value="Удалить">
             </form>
@@ -81,12 +81,12 @@ a {
      </tbody>
 </table>
 <h2>Поиск узла по имени</h2>
-<form action="{{ url_for('nodes_get') }}" method="get">
+<form action="{{ url_for('nodes.nodes_get') }}" method="get">
     <input type="text" name="search" placeholder="Имя узла">
     <input type="submit" value="Найти">
 </form>
 <h2>Создать новый узел</h2>
-    <form action="{{ url_for('nodes_create') }}" method="post">
+    <form action="{{ url_for('nodes.nodes_create') }}" method="post">
     <input type="text" name="nodename" placeholder="Имя узла">
     <input type="text" name="nodedescription" placeholder="Описание узла">
     <input type="submit" value="Создать">

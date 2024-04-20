@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>Warehouse</title>
     <style>
+        /* Стиль оформления */
         p {
             list-style: none;
             padding: 0;
@@ -50,54 +51,103 @@
     </style>
 </head>
 <body>
-<h1 style="color: brown; text-align: center;">Таблица склада</h1>
-<table>
-    <thead style="display:block">
-    <tr>
-        <th>ID</th>
-        <th width="220px" style="text-align:center">Node ID</th>
-        <th width="230px" style="text-align:center">Received Quantity</th>
-        <th width="230px" style="text-align:center">Shipped Quantity</th>
-        <th width="230px" style="text-align:center">Date</th>
-    </tr>
-    </thead>
-    <tbody>
-    {% for row in data %}
-    <tr>
-        <td>
-            <form action="{{ url_for('warehouse_update') }}" method="post">
-                <label>{{ row[0] }}</label>
-                <input type="hidden" name="id" value="{{ row[0] }}">
-                <input type="text" name="node_id" size="20" value="{{ row[1] }}">
-                <input type="text" name="received_quantity" size="30" value="{{ row[2] }}">
-                <input type="text" name="shipped_quantity" size="30" value="{{ row[3] }}">
-                <input type="text" name="date" size="30" value="{{ row[4] }}">
-                <input type="submit" value="Изменить">
-            </form>
-        </td>
-        <td>
-            <form action="{{ url_for('warehouse_delete') }}" method="post">
-                <input type="hidden" name="id" value="{{ row[0] }}">
-                <input type="submit" value="Удалить">
-            </form>
-        </td>
-    </tr>
-    {% endfor %}
-    </tbody>
-</table>
-<h2>Поиск склада по ID узла</h2>
-<form action="{{ url_for('warehouse_get') }}" method="get">
-    <input type="text" name="search" placeholder="ID узла">
-    <input type="submit" value="Найти">
-</form>
-<h2>Создать новый склад</h2>
-<form action="{{ url_for('warehouse_create') }}" method="post">
-    <input type="text" name="node_id" placeholder="ID узла">
-    <input type="text" name="received_quantity" placeholder="Количество полученного товара">
-    <input type="text" name="shipped_quantity" placeholder="Количество отгруженного товара">
-    <input type="date" name="date" placeholder="Дата">
-    <input type="submit" value="Создать">
-</form>
-<p><a href="{{ url_for('home') }}" style="text-align: center">На главную</a></p>
+    <h1 style="color: brown; text-align: center;">Таблица склада</h1>
+    <table>
+        <thead style="display:block">
+            <tr>
+                <th>ID</th>
+                <th width="220px" style="text-align:center">Node ID</th>
+                <th width="220px" style="text-align:center">Node Name</th> <!-- Новый столбец -->
+                <th width="230px" style="text-align:center">Received Quantity</th>
+                <th width="230px" style="text-align:center">Shipped Quantity</th>
+                <th width="230px" style="text-align:center">Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in data %}
+            <tr>
+                <td>
+                    <form action="{{ url_for('warehouse.warehouse_update') }}" method="post">
+                        <label>{{ row[0] }}</label>
+                        <input type="hidden" name="id" value="{{ row[0] }}">
+                        <input type="text" name="node_id" size="20" value="{{ row[1] }}">
+                        <input type="text" name="nodename" size="20" value="{{ row[2] }}" readonly> <!-- Поле только для чтения -->
+                        <input type="text" name="received_quantity" size="30" value="{{ row[3] }}">
+                        <input type="text" name="shipped_quantity" size="30" value="{{ row[4] }}">
+                        <input type="date" name="date" size="30" value="{{ row[5] }}">
+                        <input type="submit" value="Изменить">
+                    </form>
+                </td>
+                <td>
+                    <form action="{{ url_for('warehouse.warehouse_delete') }}" method="post">
+                        <input type="hidden" name="id" value="{{ row[0] }}">
+                        <input type="submit" value="Удалить">
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <h2>Поиск склада по ID узла</h2>
+    <form action="{{ url_for('warehouse.warehouse_get') }}" method="get">
+        <input type="text" name="search" placeholder="ID узла">
+        <input type="submit" value="Найти">
+    </form>
+
+    <h2>Создать новый склад</h2>
+    <form action="{{ url_for('warehouse.warehouse_create') }}" method="post">
+        <div style="display: flex; align-items: center;">
+            <input type="text" name="node_id" id="node_id" placeholder="ID узла" oninput="updateNodeInfo()">
+            <span id="node_info" style="margin-left: 10px;"></span>
+        </div>
+        <input type="text" name="received_quantity" placeholder="Количество полученного товара">
+        <input type="text" name="shipped_quantity" placeholder="Количество отгруженного товара">
+        <input type="date" name="date" placeholder="Дата">
+        <input type="submit" value="Создать">
+    </form>
+
+    <h2>Получить количество товара на складе по дате</h2>
+    <form id="stock-form" action="{{ url_for('warehouse.get_stock') }}" method="get">
+        <input type="date" id="stock-date" name="date" placeholder="Дата">
+        <input type="submit" value="Получить">
+    </form>
+
+    <div id="stock-result" style="white-space: pre-wrap;"></div>
+
+    <p><a href="{{ url_for('home') }}" style="text-align: center">На главную</a></p>
+
+    <script>
+        document.getElementById('stock-form').addEventListener('submit', function(event) {
+            event.preventDefault();  // Предотвращаем отправку формы по умолчанию
+
+            var formData = new FormData(this);  // Получаем данные формы
+            var url = this.getAttribute('action');  // Получаем URL для отправки запроса
+
+            fetch(url + '?' + new URLSearchParams(formData), { method: 'GET' })
+                .then(response => response.text())
+                .then(data => {
+                    document.getElementById('stock-result').textContent = "Итого:\n" + data;
+                })
+                .catch(error => console.error('Ошибка:', error));
+        });
+
+        // Функция для обновления информации о узле при вводе ID узла
+        function updateNodeInfo() {
+            var nodeId = document.getElementById('node_id').value;
+
+            // Запрос к серверу для получения информации об узле по его ID
+            fetch(`/warehouse/get_node_info?node_id=${nodeId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.node_id && data.node_name) {
+                        document.getElementById('node_info').textContent = `ID: ${data.node_id}, Имя узла: ${data.node_name}`;
+                    } else {
+                        document.getElementById('node_info').textContent = 'Узел не найден';
+                    }
+                })
+                .catch(error => console.error('Ошибка:', error));
+        }
+    </script>
 </body>
 </html>

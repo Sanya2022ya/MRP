@@ -1,3 +1,9 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Orders Tree</title>
 <style>
         p {
         list-style: none;
@@ -45,7 +51,43 @@ a {
         border-radius: 5px;
         width: 200px;
     }
+
+
+    .styled-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 25px 0;
+    font-size: 0.9em;
+    font-family: sans-serif;
+    border-radius: 5px 5px 0 0;
+    overflow: hidden;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+}
+
+.styled-table thead tr {
+    background-color: brown;
+    color: #ffffff;
+    text-align: left;
+}
+
+.styled-table th,
+.styled-table td {
+    padding: 12px 15px;
+}
+
+.styled-table tbody tr {
+    border-bottom: 1px solid #dddddd;
+}
+
+.styled-table tbody tr:nth-of-type(even) {
+    background-color: #f3f3f3;
+}
+
+.styled-table tbody tr:last-of-type {
+    border-bottom: 2px solid brown;
+}
 </style>
+</head>
 {% block content %}
     <h1 align="center" style="color:brown;">Таблица заказов</h1>
     
@@ -66,7 +108,7 @@ a {
             {% for row in data %}
                 <tr>
                     <td>
-                        <form action="{{ url_for('orders_update') }}" method="post">
+                        <form action="{{ url_for('orders.orders_update') }}" method="post">
                             <label>{{ row[0] }}</label>
                             <input type="hidden" name="id" value="{{ row[0] }}">
                             <input type="text" name="node_id" size="5" value="{{ row[1] }}">
@@ -79,7 +121,7 @@ a {
                         </form>
                     </td>
                     <td>
-                        <form action="{{ url_for('orders_delete') }}" method="post">
+                        <form action="{{ url_for('orders.orders_delete') }}" method="post">
                             <input type="hidden" name="id" value="{{ row[0] }}">
                             <input type="submit" value="Удалить">
                         </form>
@@ -90,7 +132,7 @@ a {
     </table>
 
     <h2>Создать новый заказ</h2>
-    <form action="{{ url_for('orders_create') }}" method="post">
+    <form action="{{ url_for('orders.orders_create') }}" method="post">
         <input type="text" name="node_id" placeholder="ID узла">
         <input type="text" name="order_date" placeholder="Дата заказа">
         <input type="text" name="quantity_ordered" placeholder="Объем заказа">
@@ -100,10 +142,53 @@ a {
         <input type="submit" value="Создать">
     </form>
     <h2>Поиск заказа по ID</h2>
-    <form action="{{ url_for('orders_get') }}" method="get">
+    <form action="{{ url_for('orders.orders_get') }}" method="get">
         <input type="text" name="id" placeholder="ID заказа">
         <input type="submit" value="Найти">
     </form>
+
+
+
+
+
+
+
+  <h1>Получить компоненты</h1>
+<form action="/orders/details" method="GET">
+        <label for="order_date">Введите дату заказа:</label>
+        <input type="date" id="order_date" name="order_date">
+        <input type="submit" value="Подтвердить">
+
+    </form>
+
+   {% if lowest_nodes %}
+    <h2>Компоненты заказов</h2>
+    <table class="styled-table">
+        <thead>
+            <tr>
+                <th>Node ID</th>
+                <th>Node Name</th>
+                <th>Node Description</th>
+                <th>Weight</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for node in lowest_nodes %}
+                <tr>
+                    <td>{{ node[0] }}</td>
+                    <td>{{ node[1] }}</td>
+                    <td>{{ node[2] }}</td>
+                    <td>{{ node[3] }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+
+{% endif %}
+
+
+
 <p><a href="{{ url_for('home') }}" style="text-align: center">На главную</a></p>
 
 {% endblock %}

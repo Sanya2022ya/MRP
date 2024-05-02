@@ -172,13 +172,11 @@ def nodes_details_route():
         return render_template('orders.html')
 
 
-
-
 def get_node_ids_by_date(cursor, order_date):
     cursor.execute('''
         SELECT DISTINCT nodeId, SUM(quantityOrdered) as quantity_ordered
         FROM Orders
-        WHERE orderDate = %s
+        WHERE orderDate <= %s
         GROUP BY nodeId
     ''', (order_date,))
     node_ids_and_quantity = cursor.fetchall()
@@ -209,36 +207,47 @@ def compute_weight_for_node(cursor, upper_node_id, current_node_id):
     return total_weight
 
 
-def get_intermediate_and_lowest_nodes(cursor, node_id, current_weight=1, node_name=None, node_description=None, level=0):
-    # Запрос на получение нижестоящих узлов и их связей
+def get_intermediate_and_lowest_nodes(cursor, node_id, current_weight=1, level=0):
+    # Query to fetch the node's name and description
+    cursor.execute('''
+        SELECT nodeName, nodeDescription
+        FROM nodes
+        WHERE id = %s
+    ''', (node_id,))
+
+    node_name, node_description = cursor.fetchone()
+
+    # Query to fetch lower nodes and their connections
     cursor.execute('''
         SELECT nodes.id, nodes.nodeName, nodes.nodeDescription, links.weight
         FROM nodes
         JOIN links ON nodes.id = links.lowerNodeName
         WHERE links.upperNodeName = %s
     ''', (node_id,))
+
     lower_nodes = cursor.fetchall()
     intermediate_nodes = []
     lowest_nodes = []
+
     if not lower_nodes:
-        # Если нет нижестоящих узлов, текущий узел считается крайне низким узлом
+        # If there are no lower nodes, the current node is considered a lowest node
         lowest_nodes.append((node_id, node_name, node_description, current_weight))
     else:
-        # Обрабатываем нижестоящие узлы
+        # Process lower nodes
         for node in lower_nodes:
             lower_node_id, node_name, node_description, link_weight = node
             total_weight = current_weight * link_weight
 
-            # Рекурсивно получаем узлы для текущего нижестоящего узла
+            # Recursively get nodes for the current lower node
             inter_nodes, low_nodes = get_intermediate_and_lowest_nodes(
-                cursor, lower_node_id, total_weight, node_name=node_name, node_description=node_description, level=level + 1
+                cursor, lower_node_id, total_weight, level=level + 1
             )
 
-            # Если текущий узел имеет нижестоящие узлы, добавляем его в промежуточные узлы
+            # If the current node has lower nodes, add it to the intermediate nodes
             if inter_nodes:
                 intermediate_nodes.append((lower_node_id, node_name, node_description, total_weight))
 
-            # Добавляем найденные узлы в списки
+            # Add found nodes to the lists
             intermediate_nodes.extend(inter_nodes)
             lowest_nodes.extend(low_nodes)
 

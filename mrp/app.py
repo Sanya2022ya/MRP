@@ -4,6 +4,7 @@ from orders import orders_bp
 from nodes import nodes_bp
 from nodes_details import nodes_details_bp
 from warehouse import warehouse_bp
+from difference import difference_bp
 import psycopg2
 
 
@@ -13,7 +14,7 @@ app.register_blueprint(orders_bp)
 app.register_blueprint(nodes_bp)
 app.register_blueprint(nodes_details_bp)
 app.register_blueprint(warehouse_bp)
-
+app.register_blueprint(difference_bp)
 
 def db_conn():
     conn = psycopg2.connect(database="mrp", host="localhost", user="postgres", password="asdf56y", port="5432")

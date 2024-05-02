@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+        <style>
+        /* Стиль оформления */
+        p {
+            list-style: none;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 20px;
+        }
+
+        a {
+            text-decoration: none;
+            width: 100px;
+            color: brown;
+            margin: 10px;
+            padding: 7px;
+            border: 2px solid brown;
+            border-radius: 8px;
+            display: block;
+            font-weight: bold;
+        }
+
+        input[type="submit"] {
+            background-color: brown;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        input[type="submit"]:hover {
+            background-color: darkbrown;
+        }
+
+        input[type="text"] {
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 2px solid brown;
+            border-radius: 5px;
+            width: 200px;
+        }
+            .styled-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 25px 0;
+    font-size: 0.9em;
+    font-family: sans-serif;
+    border-radius: 5px 5px 0 0;
+    overflow: hidden;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+}
+
+.styled-table thead tr {
+    background-color: brown;
+    color: #ffffff;
+    text-align: left;
+}
+
+.styled-table th,
+.styled-table td {
+    padding: 12px 15px;
+}
+
+.styled-table tbody tr {
+    border-bottom: 1px solid #dddddd;
+}
+
+.styled-table tbody tr:nth-of-type(even) {
+    background-color: #f3f3f3;
+}
+
+.styled-table tbody tr:last-of-type {
+    border-bottom: 2px solid brown;
+}
+    </style>
+</head>
+<body>
+ <h1>Расчитать дефицит</h1>
+<form action="/difference/details" method="GET">
+        <label for="order_date">Введите дату:</label>
+        <input type="date" id="order_date" name="order_date">
+        <input type="submit" value="Подтвердить">
+
+    </form>
+
+   {% if lowest_nodes %}
+    <h2>Недостающие компоненты</h2>
+    <table class="styled-table">
+        <thead>
+            <tr>
+                <th>Node ID</th>
+                <th>Node Name</th>
+                <th>Node Description</th>
+                <th>Shortage</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for node in lowest_nodes %}
+                <tr>
+                    <td>{{ node[0] }}</td>
+                    <td>{{ node[1] }}</td>
+                    <td>{{ node[2] }}</td>
+                    <td>{{ node[3] }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+
+{% endif %}
+ <p><a href="{{ url_for('home') }}" style="text-align: center;">На главную</a></p>
+</body>
+</html>

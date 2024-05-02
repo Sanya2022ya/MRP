@@ -48,6 +48,39 @@
             border-radius: 5px;
             width: 200px;
         }
+            .styled-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 25px 0;
+    font-size: 0.9em;
+    font-family: sans-serif;
+    border-radius: 5px 5px 0 0;
+    overflow: hidden;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+}
+
+.styled-table thead tr {
+    background-color: brown;
+    color: #ffffff;
+    text-align: left;
+}
+
+.styled-table th,
+.styled-table td {
+    padding: 12px 15px;
+}
+
+.styled-table tbody tr {
+    border-bottom: 1px solid #dddddd;
+}
+
+.styled-table tbody tr:nth-of-type(even) {
+    background-color: #f3f3f3;
+}
+
+.styled-table tbody tr:last-of-type {
+    border-bottom: 2px solid brown;
+}
     </style>
 </head>
 <body>
@@ -107,47 +140,39 @@
         <input type="submit" value="Создать">
     </form>
 
-    <h2>Получить количество товара на складе по дате</h2>
-    <form id="stock-form" action="{{ url_for('warehouse.get_stock') }}" method="get">
-        <input type="date" id="stock-date" name="date" placeholder="Дата">
-        <input type="submit" value="Получить">
+     <h1>Получить компоненты</h1>
+<form action="/warehouse/details" method="GET">
+        <label for="order_date">Введите дату заказа:</label>
+        <input type="date" id="order_date" name="order_date">
+        <input type="submit" value="Подтвердить">
+
     </form>
 
-    <div id="stock-result" style="white-space: pre-wrap;"></div>
+   {% if lowest_nodes %}
+    <h2>Компоненты заказов</h2>
+    <table class="styled-table">
+        <thead>
+            <tr>
+                <th>Node ID</th>
+                <th>Node Name</th>
+                <th>Node Description</th>
+                <th>Weight</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for node in lowest_nodes %}
+                <tr>
+                    <td>{{ node[0] }}</td>
+                    <td>{{ node[1] }}</td>
+                    <td>{{ node[2] }}</td>
+                    <td>{{ node[3] }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% else %}
 
-    <p><a href="{{ url_for('home') }}" style="text-align: center">На главную</a></p>
-
-    <script>
-        document.getElementById('stock-form').addEventListener('submit', function(event) {
-            event.preventDefault();  // Предотвращаем отправку формы по умолчанию
-
-            var formData = new FormData(this);  // Получаем данные формы
-            var url = this.getAttribute('action');  // Получаем URL для отправки запроса
-
-            fetch(url + '?' + new URLSearchParams(formData), { method: 'GET' })
-                .then(response => response.text())
-                .then(data => {
-                    document.getElementById('stock-result').textContent = "Итого:\n" + data;
-                })
-                .catch(error => console.error('Ошибка:', error));
-        });
-
-        // Функция для обновления информации о узле при вводе ID узла
-        function updateNodeInfo() {
-            var nodeId = document.getElementById('node_id').value;
-
-            // Запрос к серверу для получения информации об узле по его ID
-            fetch(`/warehouse/get_node_info?node_id=${nodeId}`)
-                .then(response => response.json())
-                .then(data => {
-                    if (data.node_id && data.node_name) {
-                        document.getElementById('node_info').textContent = `ID: ${data.node_id}, Имя узла: ${data.node_name}`;
-                    } else {
-                        document.getElementById('node_info').textContent = 'Узел не найден';
-                    }
-                })
-                .catch(error => console.error('Ошибка:', error));
-        }
-    </script>
+{% endif %}
+ <p><a href="{{ url_for('home') }}" style="text-align: center;">На главную</a></p>
 </body>
 </html>
